@@ -172,7 +172,7 @@ Node* getStructSimple() {
         std::cout << "Введите название: ";
         std::cin >> name;
         if (!name.empty()) break;
-        std::cout << "Имя не может быть пустым. Попробуйте снова.\n";
+        std::cout << "Имя не может быть пустым. Попробуйте снова\n";
     }
     Node* p = new Node{name, 0, nullptr};
     return p;
@@ -185,7 +185,7 @@ Node* getStructPriority() {
         std::cout << "Введите название: ";
         std::cin >> name;
         if (!name.empty()) break;
-        std::cout << "Имя не может быть пустым. Попробуйте снова.\n";
+        std::cout << "Имя не может быть пустым. Попробуйте снова\n";
     }
 
     while (true) {
@@ -227,7 +227,7 @@ Node* findElement(const std::string& searchStr) {
     }
 
     if (!found) {
-        std::cout << "Элемент с именем, содержащим '" << searchStr << "' не найден.\n";
+        std::cout << "Элемент с именем, содержащим '" << searchStr << "' не найден\n";
     }
 
     return nullptr;
@@ -360,6 +360,83 @@ void clearList() {
 
 void switchPriority() {
     clearScreen();
-    std::cout << "Значения приоритетов изменены))))\n";
-    return;
+
+    if (!head) {
+        std::cout << "Очередь пуста\n";
+        return;
+    }
+
+    std::string name;
+    int newPriority;
+
+    std::cout << "Введите имя элемента, чей приоритет нужно изменить: ";
+    std::cin >> name;
+
+    Node* prev = nullptr;
+    Node* cur = head;
+
+    while (cur && cur->inf != name) {
+        prev = cur;
+        cur = cur->next;
+    }
+
+    if (!cur) {
+        std::cout << "Элемент с именем '" << name << "' не найден\n";
+        return;
+    }
+
+    std::cout << "Текущий приоритет элемента '" << cur->inf 
+              << "' = " << cur->priority << "\n";
+    
+    while (true) {
+        std::cout << "Введите новый приоритет: ";
+        if (!(std::cin >> newPriority)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Ошибка ввода. Введите целое число\n";
+            continue;
+        }
+        if (newPriority < 1) {
+            std::cout << "Приоритет должен быть >= 1\n";
+            continue;
+        }
+        break;
+    }
+
+
+    if (prev) {
+        prev->next = cur->next;
+    }
+    else {
+        head = cur->next;
+    }
+
+    if (cur == last) {
+        last = prev;
+    }
+
+
+    cur->priority = newPriority;
+    cur->next = nullptr;
+
+
+    if (!head) {
+        head = last = cur;
+    } 
+    else if (cur->priority < head->priority) {
+        cur->next = head;
+        head = cur;
+    } 
+    else {
+        Node* iter = head;
+        while (iter->next && iter->next->priority <= cur->priority) {
+            iter = iter->next;
+        }
+        cur->next = iter->next;
+        iter->next = cur;
+        if (!cur->next)
+            last = cur;
+    }
+
+    std::cout << "Приоритет элемента '" << name << "' успешно изменён на " << newPriority << "\n";
 }
